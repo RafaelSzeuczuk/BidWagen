@@ -41,6 +41,40 @@ class BancoDeDados {
         where: 'id = ?',
         whereArgs: [registro.id],
       );
+  Future<void> salvarVeiculoBaixado(RegistroVeiculo registro) async {
+    final db = await bancoDados;
+    await db.transaction((transacao) async {
+      final exclusaoPendente = await transacao.query(
+        'sync_queue',
+        where: 'userId = ? AND operation = ? AND remoteId = ?',
+        whereArgs: [registro.idUsuario, 'delete', registro.id],
+        limit: 1,
+      );
+      if (exclusaoPendente.isNotEmpty) return;
+
+      final existentes = await transacao.query(
+        'vehicles',
+        where: 'id = ? AND userId = ?',
+        whereArgs: [registro.id, registro.idUsuario],
+        limit: 1,
+      );
+      if (existentes.isNotEmpty && existentes.first['synced'] == 0) return;
+
+      final dados = registro.paraMapa();
+      if (existentes.isNotEmpty) {
+        final imagemLocal = existentes.first['imagePath'] as String?;
+        if (imagemLocal != null && imagemLocal.isNotEmpty) {
+          dados['imagePath'] = imagemLocal;
+        }
+      }
+      await transacao.insert(
+        'vehicles',
+        dados,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
+  }
+
   Future<List<RegistroVeiculo>> veiculos(String idUsuario) async {
     final linhas = await (await bancoDados).query(
       'vehicles',

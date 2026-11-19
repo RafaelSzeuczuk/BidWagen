@@ -169,5 +169,35 @@ class RepositorioVeiculos {
       }
       await bancoDados.removerDaFila(operacao['id'] as String);
     }
+
+    try {
+      final documentos = await _bancoFirebase
+          .collection('users')
+          .doc(idUsuario)
+          .collection('vehicles')
+          .get();
+      for (final documento in documentos.docs) {
+        final dados = Map<String, Object?>.from(documento.data());
+        dados['id'] = documento.id;
+        dados['userId'] ??= idUsuario;
+        dados['remoteId'] = documento.id;
+        dados['synced'] = 1;
+        dados['deletedAt'] = null;
+        for (final campo in ['visitDate', 'createdAt', 'updatedAt']) {
+          dados[campo] = _normalizarDataFirestore(dados[campo]);
+        }
+        final registro = RegistroVeiculo.aPartirDoMapa(dados);
+        await bancoDados.salvarVeiculoBaixado(registro);
+      }
+    } catch (_) {
+      // Uma falha no download não apaga nem impede o uso dos dados locais.
+    }
+  }
+
+  Object? _normalizarDataFirestore(Object? valor) {
+    if (valor is Timestamp) return valor.millisecondsSinceEpoch;
+    if (valor is DateTime) return valor.millisecondsSinceEpoch;
+    if (valor is num) return valor.toInt();
+    return valor;
   }
 }

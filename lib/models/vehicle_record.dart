@@ -59,12 +59,12 @@ class RegistroVeiculo {
 
   double get descontoQuilometragem {
     if (quilometragem < 50000) return 0.05;
-    if (quilometragem < 100000) return .12;
-    if (quilometragem < 150000) return .18;
-    if (quilometragem < 200000) return .24;
-    if (quilometragem < 250000) return .30;
-    if (quilometragem < 300000) return .40;
-    return .45;
+    if (quilometragem < 100000) return 0.12;
+    if (quilometragem < 150000) return 0.18;
+    if (quilometragem < 200000) return 0.24;
+    if (quilometragem < 250000) return 0.30;
+    if (quilometragem < 300000) return 0.40;
+    return 0.45;
   }
 
   double get ofertaSugerida {

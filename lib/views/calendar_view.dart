@@ -75,9 +75,6 @@ class _EstadoTelaCalendario extends State<TelaCalendario> {
                 focado = foco;
               }),
               eventLoader: visitasDoDia,
-              headerStyle: const HeaderStyle(
-                formatButtonVisible: false,
-              ),
               calendarFormat: CalendarFormat.month,
               calendarStyle: const CalendarStyle(
                 markerDecoration: BoxDecoration(

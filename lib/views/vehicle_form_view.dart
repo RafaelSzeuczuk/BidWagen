@@ -97,7 +97,7 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
 
   double get descontoQuilometragem {
     final valor = int.tryParse(quilometragem.text) ?? 0;
-    if (valor < 50000) return 0.05;
+    if (valor < 50000) return .05;
     if (valor < 100000) return .12;
     if (valor < 150000) return .18;
     if (valor < 200000) return .24;

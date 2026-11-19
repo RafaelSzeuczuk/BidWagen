@@ -34,10 +34,18 @@ class _EstadoTelaInicial extends State<TelaInicial> {
     final usuario = context.read<ServicoAutenticacao>().usuarioAtual;
     if (usuario == null) return;
     setState(() => carregando = true);
-    itens = await context
-        .read<RepositorioVeiculos>()
-        .listarVeiculosLocais(usuario.uid);
+    final repositorio = context.read<RepositorioVeiculos>();
+    itens = await repositorio.listarVeiculosLocais(usuario.uid);
     if (mounted) setState(() => carregando = false);
+
+    try {
+      await repositorio.sincronizar(usuario.uid);
+      final itensSincronizados =
+          await repositorio.listarVeiculosLocais(usuario.uid);
+      if (mounted) setState(() => itens = itensSincronizados);
+    } catch (_) {
+      // Mantém o cache local disponível mesmo se o Firebase falhar.
+    }
   }
 
   Future<void> remover(RegistroVeiculo veiculo) async {
