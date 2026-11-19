@@ -48,23 +48,23 @@ class RegistroVeiculo {
   final DateTime? atualizadoEm;
 
   double get descontoConservacao {
-    if (conservacao >= 95) return 0.0;
-    if (conservacao >= 90) return 0.05;
-    if (conservacao >= 80) return 0.08;
-    if (conservacao >= 70) return 0.12;
-    if (conservacao >= 60) return 0.18;
-    if (conservacao >= 50) return 0.25;
-    return 0.35;
+    if (conservacao >= 95) return 0.04;
+    if (conservacao >= 90) return 0.10;
+    if (conservacao >= 80) return 0.22;
+    if (conservacao >= 70) return 0.35;
+    if (conservacao >= 60) return 0.48;
+    if (conservacao >= 50) return 0.60;
+    return 0.65;
   }
 
   double get descontoQuilometragem {
-    if (quilometragem < 50000) return 0.0;
-    if (quilometragem < 100000) return 0.05;
-    if (quilometragem < 150000) return 0.10;
-    if (quilometragem < 200000) return 0.16;
-    if (quilometragem < 250000) return 0.23;
-    if (quilometragem < 300000) return 0.30;
-    return 0.40;
+    if (quilometragem < 50000) return 0.05;
+    if (quilometragem < 100000) return .12;
+    if (quilometragem < 150000) return .18;
+    if (quilometragem < 200000) return .24;
+    if (quilometragem < 250000) return .30;
+    if (quilometragem < 300000) return .40;
+    return .45;
   }
 
   double get ofertaSugerida {
