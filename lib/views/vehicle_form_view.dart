@@ -92,7 +92,7 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
     if (valor >= 70) return .35;
     if (valor >= 60) return .48;
     if (valor >= 50) return .60;
-    return .35;
+    return .65;
   }
 
   double get descontoQuilometragem {
@@ -103,7 +103,7 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
     if (valor < 200000) return .24;
     if (valor < 250000) return .30;
     if (valor < 300000) return .40;
-    return .40;
+    return .45;
   }
 
   Widget previsualizacaoOferta() {
