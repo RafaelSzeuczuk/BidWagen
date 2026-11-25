@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../models/vehicle_record.dart';
 import '../services/currency_formatter.dart';
+import 'status_chip.dart';
 
 class CartaoVeiculo extends StatelessWidget {
   const CartaoVeiculo({
@@ -25,6 +26,7 @@ class CartaoVeiculo extends StatelessWidget {
     final corSuave = Theme.of(context).colorScheme.onSurface.withOpacity(.68);
     final possuiFoto = veiculo.caminhoImagem != null &&
         File(veiculo.caminhoImagem!).existsSync();
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 16, 12, 18),
@@ -113,6 +115,10 @@ class CartaoVeiculo extends StatelessWidget {
                     icone: Icons.event_outlined,
                     label: DateFormat('dd/MM/yyyy').format(veiculo.dataVisita!),
                   ),
+                IndicadorStatus(
+                  label: veiculo.sincronizado ? 'Sincronizado' : 'Pendente',
+                  cor: veiculo.sincronizado ? Colors.green : Colors.orange,
+                ),
               ],
             ),
             const SizedBox(height: 18),
@@ -151,8 +157,10 @@ class CartaoVeiculo extends StatelessWidget {
 
 class _EtiquetaInformacao extends StatelessWidget {
   const _EtiquetaInformacao({required this.icone, required this.label});
+
   final IconData icone;
   final String label;
+
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
@@ -163,12 +171,18 @@ class _EtiquetaInformacao extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icone,
-                size: 16, color: Theme.of(context).colorScheme.secondary),
+            Icon(
+              icone,
+              size: 16,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
             const SizedBox(width: 7),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -182,10 +196,12 @@ class _ValorCalculado extends StatelessWidget {
     required this.corSuave,
     this.accent = false,
   });
+
   final String label;
   final String value;
   final Color corSuave;
   final bool accent;
+
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,8 +213,9 @@ class _ValorCalculado extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color:
-                  accent ? Theme.of(context).colorScheme.primary : Colors.white,
+              color: accent
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white,
             ),
           ),
         ],

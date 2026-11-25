@@ -17,34 +17,78 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
   final email = TextEditingController();
   final senha = TextEditingController();
   final confirmacao = TextEditingController();
+
   bool carregando = false;
   String? erro;
 
+  @override
+  void dispose() {
+    nome.dispose();
+    email.dispose();
+    senha.dispose();
+    confirmacao.dispose();
+    super.dispose();
+  }
+
   Future<void> enviarFormulario() async {
-    if (nome.text.trim().isEmpty ||
-        email.text.trim().isEmpty ||
-        senha.text.length < 6) {
-      setState(
-        () => erro =
-            'Preencha os campos e use uma senha com 6 ou mais caracteres.',
-      );
+    if (nome.text.trim().isEmpty || email.text.trim().isEmpty) {
+      setState(() => erro = 'Preencha o nome e o e-mail.');
       return;
     }
+
+    final requisitosPendentes = <String>[];
+
+    if (senha.text.length < 6) {
+      requisitosPendentes.add('pelo menos 6 caracteres');
+    }
+
+    if (!RegExp(r'[A-ZÀ-ÖØ-Þ]').hasMatch(senha.text)) {
+      requisitosPendentes.add('uma letra maiúscula');
+    }
+
+    if (!RegExp(r'[a-zà-öø-ÿ]').hasMatch(senha.text)) {
+      requisitosPendentes.add('uma letra minúscula');
+    }
+
+    if (!RegExp(r'[0-9]').hasMatch(senha.text)) {
+      requisitosPendentes.add('um número');
+    }
+
+    if (!RegExp(r'[^A-Za-zÀ-ÖØ-öø-ÿ0-9\s]').hasMatch(senha.text)) {
+      requisitosPendentes.add('um símbolo');
+    }
+
+    if (requisitosPendentes.isNotEmpty) {
+      setState(() {
+        erro = 'A senha precisa conter ${requisitosPendentes.join(', ')}.';
+      });
+      return;
+    }
+
     if (senha.text != confirmacao.text) {
       setState(() => erro = 'As senhas não coincidem.');
       return;
     }
-    setState(() => carregando = true);
+
+    setState(() {
+      carregando = true;
+      erro = null;
+    });
+
     try {
       await context.read<ServicoAutenticacao>().cadastrar(
             nome: nome.text,
             email: email.text,
             senha: senha.text,
           );
+
       if (mounted) Navigator.pop(context);
     } catch (excecao) {
-      setState(
-          () => erro = context.read<ServicoAutenticacao>().mensagem(excecao));
+      if (mounted) {
+        setState(() {
+          erro = context.read<ServicoAutenticacao>().mensagem(excecao);
+        });
+      }
     } finally {
       if (mounted) setState(() => carregando = false);
     }
@@ -61,25 +105,34 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
             const LogotipoAplicativo(tamanho: 90),
             TextField(
               controller: nome,
-              decoration: const InputDecoration(labelText: 'Nome completo'),
+              decoration: const InputDecoration(
+                labelText: 'Nome completo',
+              ),
             ),
             const SizedBox(height: 14),
             TextField(
               controller: email,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: 'E-mail'),
+              decoration: const InputDecoration(
+                labelText: 'E-mail',
+              ),
             ),
             const SizedBox(height: 14),
             TextField(
               controller: senha,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Senha'),
+              decoration: const InputDecoration(
+                labelText: 'Senha',
+                hintText: 'Mínimo 6 caracteres, incluindo A, a, 1 e !',
+              ),
             ),
             const SizedBox(height: 14),
             TextField(
               controller: confirmacao,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Confirmar senha'),
+              decoration: const InputDecoration(
+                labelText: 'Confirmar senha',
+              ),
             ),
             if (erro != null)
               Padding(

@@ -32,8 +32,9 @@ class RepositorioVeiculos {
     return servicoFipe.consultarPlaca(placa);
   }
 
-  Future<String?> selecionarImagem() async => (await ImagePicker().pickImage(
-        source: ImageSource.camera,
+  Future<String?> selecionarImagem(ImageSource origem) async =>
+      (await ImagePicker().pickImage(
+        source: origem,
         imageQuality: 82,
       ))
           ?.path;
@@ -153,7 +154,7 @@ class RepositorioVeiculos {
     for (final operacao in fila) {
       if (operacao['operation'] == 'delete') {
         final idRemoto =
-            operacao['remoteId'] as String? ?? operacao['entityId'] as String?;
+            operacao['remoteId'] as String? ?? operacao['entityId'] as String?; 
         if (idRemoto != null) {
           try {
             await _bancoFirebase

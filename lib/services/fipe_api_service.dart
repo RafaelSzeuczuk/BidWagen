@@ -89,8 +89,6 @@ class ServicoApiFipe {
     final dadosVeiculoJson = _converterParaMapa(decodificado);
     final veiculo = VeiculoDaApi.aPartirDoJson(dadosVeiculoJson);
 
-    // A API de placa não envia o preço FIPE diretamente. O endpoint /fipe/marca
-    // retorna a tabela da marca, então filtramos o modelo e o ano retornados pela placa.
     try {
       final fipe = await _buscarDadosFipe(veiculo);
       return veiculo.comDadosFipe(fipe);

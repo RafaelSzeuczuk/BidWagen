@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../components/offline_notice.dart';
@@ -32,9 +33,12 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
     super.initState();
     final veiculo = widget.registroExistente;
     placa = TextEditingController(text: veiculo?.placa ?? '');
-    quilometragem =
-        TextEditingController(text: '${veiculo?.quilometragem ?? 0}');
-    conservacao = TextEditingController(text: '${veiculo?.conservacao ?? 90}');
+    quilometragem = TextEditingController(
+      text: veiculo == null ? '' : '${veiculo.quilometragem}',
+    );
+    conservacao = TextEditingController(
+      text: veiculo == null ? '' : '${veiculo.conservacao}',
+    );
     descricao = TextEditingController(text: veiculo?.descricao ?? '');
     caminhoImagem = veiculo?.caminhoImagem;
   }
@@ -79,9 +83,30 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
   }
 
   Future<void> selecionarImagem() async {
-    caminhoImagem =
-        await context.read<RepositorioVeiculos>().selecionarImagem();
-    if (mounted) setState(() {});
+    final origem = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Tirar foto'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Escolher da galeria'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (origem == null) return;
+
+    final imagem =
+        await context.read<RepositorioVeiculos>().selecionarImagem(origem);
+    if (imagem != null && mounted) setState(() => caminhoImagem = imagem);
   }
 
   double get descontoConservacao {
@@ -385,6 +410,7 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
                 labelText: 'Conservação (%)',
+                hintText: 'Ex.: 90',
                 prefixIcon: Icon(Icons.health_and_safety_outlined),
               ),
               validator: (valor) {
@@ -401,6 +427,7 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
                 labelText: 'Quilometragem (km)',
+                hintText: 'Ex.: 85000',
                 prefixIcon: Icon(Icons.speed),
               ),
               validator: (valor) => int.tryParse(valor ?? '') == null
@@ -426,9 +453,11 @@ class _EstadoTelaFormularioVeiculo extends State<TelaFormularioVeiculo> {
             ),
             OutlinedButton.icon(
               onPressed: selecionarImagem,
-              icon: const Icon(Icons.camera_alt_outlined),
+              icon: const Icon(Icons.add_a_photo_outlined),
               label: Text(
-                caminhoImagem == null ? 'Tirar foto do veículo' : 'Trocar foto',
+                caminhoImagem == null
+                    ? 'Adicionar foto do veículo'
+                    : 'Trocar foto',
               ),
             ),
             if (caminhoImagem != null)
